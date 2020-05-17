@@ -1,4 +1,12 @@
 <style lang="less">
+  .index-container{
+    min-height: 1333rpx;
+    background-image: url('http://wicdn.xiaohongchun.com/goodsmark/1589711923628_RKBMkTrSzc.png');
+    background-position: center, center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
   .userinfo {
     display: flex;
     flex-direction: column;
@@ -14,64 +22,40 @@
   .userinfo-nickname {
     color: #aaa;
   }
+
+  input[type='text']{
+    width: 80%;
+    margin: 0 auto;
+    border: 1px solid #f5f5f5;
+    border-radius: 10rpx;
+    color: #000;
+    margin-top: 20rpx;
+    padding: 10rpx 15rpx;
+  }
+
+  .placeholder-class{
+    color: #cccccc;
+  }
+
+  button{
+    margin-top: 200rpx;
+    background: linear-gradient(#fcf5b8,#b4cd93);
+  }
 </style>
 <template>
-  <view class="container">
+  <view class="index-container">
     <view class="userinfo" @tap="handleViewTap">
       <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
       <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
     </view>
 
-    <panel>
-      <view class="title" slot="title">测试数据绑定</view>
+    <input type="text" placeholder="请输入宝宝的姓氏" placeholder-class="placeholder-class" value="{{firstName}}" bindinput="inputName" />
+    <input type="text" placeholder="请输入宝宝的出生日期(预产期)" placeholder-class="placeholder-class"/>
+    <input type="text" placeholder="请输入宝宝的性别(男、女、未知)" placeholder-class="placeholder-class"/>
 
-      <text class="info">{{normalTitle}}</text>
-      <text class="info">{{setTimeoutTitle}}</text>
-      <text class="info">{{mixin}}</text>
-      <text class="info">{{mynum}}</text>
-      <text class="info">{{now}}</text>
-      <button @tap="plus('a')" size="mini">  +  </button>
-    </panel>
+    <button @tap="generate">开始生成名字</button>
 
-    <panel>
-      <view class="title" slot="title">其它测试</view>
-      <button @tap="toast" size="mini">第三方组件</button>
-      <button @tap="communicate" size="mini">组件通信</button>
-      <button @tap="tap" size="mini">混合TAP事件</button>
-    </panel>
-
-    <panel>
-      <view class="title" slot="title">测试并发网络请求</view>
-      <view>返回结果: <text>{{netrst}}</text></view>
-      <button @tap="request" size="mini"> 点我发起10个请求 </button>
-    </panel>
-
-    <panel>
-      <view class="title" slot="title">测试组件</view>
-
-      <text class="testcounter">计数组件1: </text>
-      <view class="counterview">
-        <counter1 @index-emit.user="counterEmit" />
-      </view>
-
-      <text class="testcounter">计数组件2: </text>
-
-      <view class="counterview">
-        <counter2 :num.sync="mynum"></counter2>
-      </view>
-    </panel>
-
-    <panel>
-      <view class="title" slot="title">测试组件Repeat</view>
-      <repeat for="" index="index" item="item" key="key">
-        <group :grouplist="item" :indexa="index"></group>
-      </repeat>
-    </panel>
-
-    <panel>
-      <view class="title" slot="title">测试列表</view>
-      <list></list>
-    </panel>
+    <view v-if="generatedName">{{generatedName}}</view>
 
     <toast />
   </view>
@@ -79,147 +63,70 @@
 
 <script>
   import wepy from 'wepy'
-  import Panel from '@/components/panel' // alias example
-  import Counter from 'counter' // alias example
-  import List from '../components/list' // aliasFields example
-  import moduleA from 'module-a' // aliasFields ignore module example
-  import Group from '../components/group'
   import Toast from 'wepy-com-toast'
-  import testMixin from '../mixins/test'
-
-  console.log('moduleA ignored: ', moduleA) // => moduleA ignored: {}
-
 
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '宝宝取名宝典'
     }
     components = {
-      panel: Panel,
-      counter1: Counter,
-      counter2: Counter,
-      list: List,
-      group: Group,
       toast: Toast
     }
 
-    mixins = [testMixin]
-
     data = {
       mynum: 20,
+      firstName: '',
+      generatedName: '',
       userInfo: {
-        nickName: '加载中...'
       },
-      normalTitle: '原始标题',
-      setTimeoutTitle: '标题三秒后会被修改',
-      count: 0,
-      netrst: '',
-      groupList: [
-        {
-          id: 1,
-          name: '点击改变',
-          list: [
-            {
-              childid: '1.1',
-              childname: '子项，点我改变'
-            }, {
-              childid: '1.2',
-              childname: '子项，点我改变'
-            }, {
-              childid: '1.3',
-              childname: '子项，点我改变'
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: '点击改变',
-          list: [
-            {
-              childid: '2.1',
-              childname: '子项，点我改变'
-            }, {
-              childid: '2.2',
-              childname: '子项，点我改变'
-            }, {
-              childid: '2.3',
-              childname: '子项，点我改变'
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: '点击改变',
-          list: [
-            {
-              childid: '3.1',
-              childname: '子项，点我改变'
-            }
-          ]
-        }
-      ]
-    }
-
-    computed = {
-      now () {
-        return +new Date()
-      }
+      single_name: [
+        '梓', '晨', '丽', '丹', '佩', '惠', '月', '玉', '婉', '晓', '玲', '倩', '瑞', '静', "颖",
+        '爱', '姿', '惠', '娇', '媛', '妩', '萱', '娈', '瑗', '悠', '源', '赫', '晗', '贻', "楚",
+        '梦', '琪', '忆', '柳', '桃', '慕', '兰', '岚', '香', '沛', '菡', '珊', '曼', '菱', "寒",
+        '柔', '蓉', '安', '蓝', '春', '语', '彤', '晴', '语', '菱', '霜', '紫', '莲', '翠', "烟",
+        '南', '寻', '慕', '蕊', '雪', '海', '沛', '宛', '晓', '菡', '巧', '听', '卉', '靖', "枫",
+        '薇', '忆', '旋', '芷', '蕾', '代', '芙', '盼', '蝶', '筠', '瑶', '珍', '谷', '荷', "画",
+        '棋', '芹', '萍', '幻', '露', '灵', '含', '雅', '薇', '瑶', '丹', '丽', '云', '亿', "仪",
+        '伊', '伶', '佳', '依', '俞', '俪', '倩', '倨', '兰', '冰', '凝', '凡', '凤', '叆', "昤",
+        '嘉', '囡', '女', '如', '妃', '妍', '妙', '妮', '妹', '姐', '姑', '姗', '姝', '蛣', "姣",
+        '姬', '娅', '娆', '娇', '娉', '娜', '娟', '娣', '娥', '娴', '婉', '婕', '婧', '婵', "婷",
+        '媚', '媛', '嫔', '嫣', '嫱', '安', '宛', '宜', '宝', '容', '巧', '希', '彤', '彩', "心",
+        '忆', '念', '怀', '怜', '思', '怡', '情', '惠', '慧', '敏', '旭', '春', '晴', '曼', "月",
+        '梅', '梦', '楠', '檀', '欢', '欣', '歆', '毓', '水', '洁', '涵', '淑', '清', '滟', "滢",
+        '漪', '漫', '澜', '灵', '煜', '燕', '玉', '玥', '玫', '环', '玲', '珂', '珊', '珍', "珠",
+        '琦', '琪', '琬', '琰', '琳', '琴', '琼', '瑗', '瑛', '瑜', '瑶', '瑾', '璇', '璐', "璟",
+        '白', '盈', '盼', '碧', '秀', '筠', '红', '绮', '美', '翠', '艳', '瓦', '芊', '芝', "芬",
+        '芮', '芯', '芳', '芷', '芸', '苑', '若', '苹', '茗', '茜', '茵', '茹', '荔', '荭', "荷",
+        '莉', '莎', '莲', '莹', '菁', '菡', '菲', '萍', '萱', '蓉', '蓓', '蔓', '蕊', '蕾', "薇",
+        '诗', '语', '贞', '采', '钰', '银', '雅', '雨', '雪', '雯', '霏', '霖', '霜', '霞', "露",
+        '青', '静', '音', '韵', '颖', '颜', '香', '馨', '黛']
     }
 
     methods = {
-      plus () {
-        this.mynum++
+      inputName: function (e) {
+        this.firstName = e.detail.value
       },
-      toast () {
+      generate: function() {
         let promise = this.$invoke('toast', 'show', {
-          title: '自定义标题',
-          img: 'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
+          title: '正在生成名字'
         })
 
         promise.then((d) => {
           console.log('toast done')
         })
-      },
-      tap () {
-        console.log('do noting from ' + this.$name)
-      },
-      communicate () {
-        console.log(this.$name + ' tap')
 
-        this.$invoke('counter2', 'minus', 45, 6)
-        this.$invoke('counter1', 'plus', 45, 6)
+        let length = this.single_name.length
 
-        this.$broadcast('index-broadcast', 1, 3, 4)
-      },
-      request () {
-        let self = this
-        let i = 10
-        let map = ['MA==', 'MQo=', 'Mg==', 'Mw==', 'NA==', 'NQ==', 'Ng==', 'Nw==', 'OA==', 'OQ==']
-        while (i--) {
-          wepy.request({
-            url: 'https://www.madcoder.cn/tests/sleep.php?time=1&t=css&c=' + map[i] + '&i=' + i,
-            success: function (d) {
-              self.netrst += d.data + '.'
-              self.$apply()
-            }
-          })
-        }
-      },
-      counterEmit (...args) {
-        let $event = args[args.length - 1]
-        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+        this.generatedName = this.firstName + this.single_name[Math.floor(Math.random(length) * length)]
       }
     }
 
     events = {
-      'index-emit': (...args) => {
-        let $event = args[args.length - 1]
-        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
-      }
     }
 
     onLoad() {
       let self = this
+      console.log(this.single_name)
       this.$parent.getUserInfo(function (userInfo) {
         if (userInfo) {
           self.userInfo = userInfo
