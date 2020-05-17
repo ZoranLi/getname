@@ -1,0 +1,13 @@
+{
+  "description": "名字",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wxdd894fe95a5d48cf",
+  "projectname": "qumingzi",
+  "miniprogramRoot": "./dist"
+}
